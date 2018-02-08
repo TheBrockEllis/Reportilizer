@@ -1,0 +1,9 @@
+#canvas {
+  float: right;
+  /* A4 is 210mm x 297mm. There are 3.779528 px/mm. 210 * 3.779528  */
+  width: 793.70088px;
+  height: 1122.519816px;
+  background-color: #b0b0b0;
+  padding: 10px;
+  position: relative;
+}

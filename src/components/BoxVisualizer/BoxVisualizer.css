@@ -1,0 +1,15 @@
+#visualizer {
+  height: 400px;
+  width: 400px;
+  float: left;
+  background-color: #b0b0b0;
+  padding: 10px;
+}
+
+table {
+  width: 100%;
+}
+
+th, td {
+  width: auto;
+}
