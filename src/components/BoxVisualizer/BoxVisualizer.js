@@ -6,10 +6,15 @@ export class BoxVisualizer extends React.Component {
     super(props);
 
     this.handleDelete = this.handleDelete.bind(this);
+    this.selectCodeBox = this.selectCodeBox.bind(this);
   }
 
   handleDelete(box, index){
     this.props.deleteBox(box, index);
+  }
+
+  selectCodeBox(box, index){
+    this.props.selectCodeBox(box, index);
   }
 
   render(){
@@ -28,6 +33,7 @@ export class BoxVisualizer extends React.Component {
               <th>Width</th>
               <th>Height</th>
               <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -42,6 +48,7 @@ export class BoxVisualizer extends React.Component {
                 <td>{box.width}</td>
                 <td>{box.height}</td>
                 <td><button onClick={() => this.handleDelete(box, index)}>delete</button></td>
+                <td><button onClick={() => this.selectCodeBox(box, index)}> ~ </button></td>
               </tr>
             )
           })}

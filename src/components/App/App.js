@@ -5,82 +5,118 @@ import { BoxVisualizer } from '../BoxVisualizer/BoxVisualizer';
 import { BoxDrawer } from '../BoxDrawer/BoxDrawer';
 import { CodeEditor } from '../CodeEditor/CodeEditor';
 
-// import { data } from '../../lib/fixture-data';
+import { fixture_data } from '../../lib/fixture-data';
+import dot from 'dot';
+import juice from 'juice';
 
-import jsPDF from 'jspdf';
+// dot.templateSettings = {
+//   strip: false,
+//   varname: 'yo'
+// }
+
+var wkhtmltopdf, mkdirp;
+
+// if( window.electron ){
+  wkhtmltopdf = window.require('wkhtmltopdf');
+  mkdirp = window.require('mkdirp');
+// }
 
 class App extends Component {
   constructor(props){
     super(props);
 
-    var pdf = new jsPDF({
-      orientation: 'p',
-      unit: 'mm',
-      format: 'letter',
-    });
-
-    this.state = {
-      pdf: pdf,
-      boxes: [],
-      boxIndex: 0
-    };
+    if(localStorage.getItem('reportcard')){
+      this.state = JSON.parse(localStorage.getItem('reportcard'));
+    }else{
+      this.state = this.initState();
+    }
 
     this.generatePDF = this.generatePDF.bind(this);
-    // this.generateRandomBox = this.generateRandomBox.bind(this);
     this.addBox = this.addBox.bind(this);
     this.deleteBox = this.deleteBox.bind(this);
     this.updateCode = this.updateCode.bind(this);
+    this.updateStyle = this.updateStyle.bind(this);
+    this.selectCodeBox = this.selectCodeBox.bind(this);
+    this.saveState = this.saveState.bind(this);
+    this.deleteState = this.deleteState.bind(this);
+    this.generatePDF = this.generatePDF.bind(this);
+  }
+
+  componentDidMount(){
+    this.state.boxes.forEach(box => {
+      this.refs.drawer.paintBox(box);
+    })
+  }
+
+  initState(){
+    return {
+      boxes: [],
+      boxIndex: 0,
+      selectedCodeBox: 0
+    }
   }
 
   generatePDF(){
-    this.state.pdf.text('Custom Report Card', 10, 10);
+    // save the report card to localStorage
+    localStorage.setItem('reportcard', JSON.stringify(this.state));
 
-    // draw all of the saved boxes to the PDF
+    // create a 'PDF' div that will be hidden from view and used to take a snapshot
+    let printablePdf = document.createElement('div');
+    printablePdf.id = 'printablePdf';
+    printablePdf.style.width = '216mm';
+    printablePdf.style.height = '279mm';
+    printablePdf.style.margin = 0;
+    printablePdf.style.position = 'relative';
+
+    document.getElementsByTagName('body')[0].appendChild(printablePdf);
+
     this.state.boxes.forEach(box => {
-      this.state.pdf.rect(box.x, box.y, box.width, box.height);
-      console.log(box.code);
-      console.log(box.x);
-      console.log(box.y);
-      this.state.pdf.text(box.code, box.x, box.y);
+      let div = document.createElement('div');
+      div.style.position = 'absolute';
+      div.style.left = box.x + 'mm';
+      div.style.top = box.y + 'mm';
+      div.style.width = box.width + 'mm';
+      div.style.height = box.height + 'mm';
+      div.style.border = '1px solid #f1f1f1'; //remove this later
+
+      // run the template and do all of the fancy shit
+      let templateFunction = dot.template(box.code);
+      let html = templateFunction(fixture_data);
+
+      // inline all of the CSS styles we have
+      html = juice.inlineContent(html, box.style);
+
+      //append that shit to the box
+      div.innerHTML = html;
+
+      console.log(html);
+      printablePdf.appendChild(div);
     });
 
-    this.state.pdf.save('rando.pdf');
-  }
+    mkdirp('./public/tmp/');
 
-  // generateRandomBox(){
-  //   let x = this.generateRandomNumber(100);
-  //   let y = this.generateRandomNumber(100);
-  //   let w = this.generateRandomNumber(100);
-  //   let h = this.generateRandomNumber(100);
-  //
-  //   let box = {
-  //     x: x,
-  //     y: y,
-  //     width: w,
-  //     height: h
-  //   }
-  //
-  //   this.addBox(box);
-  // }
+    wkhtmltopdf(printablePdf.outerHTML, {
+      output: './public/tmp/wkhtmlpdf.pdf',
+      dpi: 300,
+      pageSize: 'Letter',
+      marginLeft: 0,
+      marginRight: 0
+    });
+
+    printablePdf.style.display = 'none';
+  }
 
   addBox(box){
     box['boxIndex'] = this.state.boxIndex;
     box['code'] = '';
-
-    console.log(box);
+    box['style'] = '';
 
     this.setState({
       boxes: [...this.state.boxes, box],
       boxIndex: this.state.boxIndex + 1
     });
 
-    // console.log(this.state.boxes);
-    // console.log(this.state.boxes.indexOf(box));
-
     this.refs.drawer.paintBox(box);
-
-    //console.log(`A ${box.width} x ${box.height} rect was added at ${box.x} and ${box.y}`);
-    //console.log(this.state.boxes);
   }
 
   deleteBox(box){
@@ -103,28 +139,47 @@ class App extends Component {
     })
   }
 
+  saveState(){
+    localStorage.setItem('reportcard', this.state);
+  }
+
+  deleteState(){
+    localStorage.removeItem('reportcard');
+    this.setState( this.initState() );
+  }
+
   updateCode(boxIndex, text){
     let boxes = this.state.boxes;
-    boxes[boxIndex].code = text;
+    boxes[boxIndex].code = `${text}`;
 
     this.setState({
       boxes: boxes
     })
   }
 
-  // generateRandomNumber(limit){
-  //   return Math.floor(Math.random() * limit);
-  // }
+  updateStyle(boxIndex, text){
+    let boxes = this.state.boxes;
+    boxes[boxIndex].style = text;
+
+    this.setState({
+      boxes: boxes
+    })
+  }
+
+  selectCodeBox(box, index){
+    this.child.updateSelectedBoxIndex(index);
+  }
 
   render() {
     return (
       <div className="App">
-        { /* <button onClick={this.generateRandomBox}>Add random box</button> */ }
+        <button onClick={this.deleteState}>Delete Template</button>
+        <button onClick={this.saveState}>Save Template</button>
         <button onClick={this.generatePDF}>Generate PDF</button>
 
-        <BoxVisualizer boxes={this.state.boxes} deleteBox={this.deleteBox} />
+        <BoxVisualizer boxes={this.state.boxes} deleteBox={this.deleteBox} selectCodeBox={this.selectCodeBox} />
         <BoxDrawer addBox={this.addBox} boxes={this.state.boxes} ref='drawer' />
-        <CodeEditor boxes={this.state.boxes} updateCode={this.updateCode} />
+        <CodeEditor boxes={this.state.boxes} updateCode={this.updateCode} updateStyle={this.updateStyle} ref={instance => { this.child = instance; }} />
       </div>
     );
   }

@@ -1,4 +1,5 @@
 import React from 'react';
+import './CodeEditor.css';
 
 export class CodeEditor extends React.Component {
   constructor(props){
@@ -9,37 +10,55 @@ export class CodeEditor extends React.Component {
     }
 
     this.updateCode = this.updateCode.bind(this);
+    this.updateStyle = this.updateStyle.bind(this);
     this.handleBoxSelect = this.handleBoxSelect.bind(this);
   }
 
   updateCode(event){
-    console.log(event.target.value);
-    // this.setState({value: event.target.value});
     this.props.updateCode(this.state.selectedBoxIndex, event.target.value);
   }
 
+  updateStyle(event){
+    this.props.updateStyle(this.state.selectedBoxIndex, event.target.value);
+  }
+
   handleBoxSelect(event){
-    this.setState({selectedBoxIndex: event.target.value});
+    this.updateSelectedBoxIndex(event.target.value);
+  }
+
+  updateSelectedBoxIndex(index){
+    this.setState({selectedBoxIndex: index});
   }
 
   render(){
-    var code;
+    var code, style;
+
     if(this.props.boxes.length > 0) {
       code = this.props.boxes[this.state.selectedBoxIndex].code;
+      style = this.props.boxes[this.state.selectedBoxIndex].style;
     }else{
+      style = '';
       code = '';
     }
 
     return (
-      <div>
-        <select onChange={this.handleBoxSelect}>
-          { this.props.boxes.map( (box, index) => {
-              return <option key={index} value={box.boxIndex}>{box.boxIndex}</option>;
-            })
-          }
-        </select>
-        { /* <textarea onChange={this.updateCode} value={this.state.value} /> */ }
+      <div id='codeeditor'>
+
+        <div> Box:
+          <select onChange={this.handleBoxSelect} value={this.state.selectedBoxIndex}>
+            { this.props.boxes.map( (box, index) => {
+                return <option key={index} value={box.boxIndex}>{box.boxIndex}</option>;
+              })
+            }
+          </select>
+        </div>
+
+        <p>HTML/Template Code</p>
         <textarea onChange={this.updateCode} value={code} />
+
+        <p>Styling</p>
+        <textarea onChange={this.updateStyle} value={style} />
+
       </div>
     )
   }

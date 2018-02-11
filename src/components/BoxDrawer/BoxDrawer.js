@@ -42,7 +42,7 @@ export class BoxDrawer extends React.Component {
 
     //if there are two, fire the parent addBox event and clear state
     if(this.state.points.length === 2){
-      console.log("We've got enough to draw a box!", this.state);
+      // console.log("We've got enough to draw a box!", this.state);
 
       // we know two x, y coordinates
       // we assume tha the first point is the top, left hand corner and the second is the bottom right hand corner
@@ -89,10 +89,10 @@ export class BoxDrawer extends React.Component {
 
   removeMark(){
     let marks = document.getElementsByClassName('mark');
-    console.log(marks);
+    // console.log(marks);
 
     [].forEach.call(marks, instance => {
-      console.log(instance);
+      // console.log(instance);
       instance.parentNode.removeChild(instance);
     });
   }

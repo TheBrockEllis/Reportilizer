@@ -1,0 +1,12 @@
+#codeeditor {
+  margin-top: 25px;
+  border-top: 1px solid #f1f1f1;
+  padding-top: 25px;
+}
+select {
+  margin-left: 15px;
+}
+
+textarea {
+  height: 25vh;
+}
