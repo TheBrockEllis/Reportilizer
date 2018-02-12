@@ -14,6 +14,7 @@ export class BoxDrawer extends React.Component {
     this.markBox = this.markBox.bind(this);
     this.placeMark = this.placeMark.bind(this);
     this.removeMark = this.removeMark.bind(this);
+    this.handleToggle = this.handleToggle.bind(this);
   }
 
   markBox(event){
@@ -114,10 +115,19 @@ export class BoxDrawer extends React.Component {
     // })
   }
 
+  handleToggle(event){
+    event.stopPropagation();
+    this.props.toggleDrawer();
+  }
+
   render(){
     return (
-      <div id='canvas' onClick={this.markBox}>
-        Click twice to create a new box:
+      <div className={ (this.props.drawerHidden ? 'hide' : '') }>
+        <div id='modalBackground' />
+        <div id='canvas' onClick={this.markBox}>
+          <button onClick={this.handleToggle}>X</button>
+          Click twice to create a new box:
+        </div>
       </div>
     )
 

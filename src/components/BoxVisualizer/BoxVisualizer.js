@@ -43,12 +43,12 @@ export class BoxVisualizer extends React.Component {
             return (
               <tr key={index}>
                 <td>{box.boxIndex}</td>
-                <td>{box.x}</td>
-                <td>{box.y}</td>
-                <td>{box.width}</td>
-                <td>{box.height}</td>
+                <td><input type='number' defaultValue={box.x} /></td>
+                <td><input type='number' defaultValue={box.y} /></td>
+                <td><input type='number' defaultValue={box.width} /></td>
+                <td><input type='number' defaultValue={box.height} /></td>
                 <td><button onClick={() => this.handleDelete(box, index)}>delete</button></td>
-                <td><button onClick={() => this.selectCodeBox(box, index)}> ~ </button></td>
+                <td><button onClick={() => this.selectCodeBox(box, index)}>&lt;&gt;</button></td>
               </tr>
             )
           })}

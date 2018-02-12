@@ -1,5 +1,6 @@
 import React from 'react';
 import './CodeEditor.css';
+import Behave from 'behave-js';
 
 export class CodeEditor extends React.Component {
   constructor(props){
@@ -12,6 +13,16 @@ export class CodeEditor extends React.Component {
     this.updateCode = this.updateCode.bind(this);
     this.updateStyle = this.updateStyle.bind(this);
     this.handleBoxSelect = this.handleBoxSelect.bind(this);
+  }
+
+  componentDidMount(){
+    new Behave({
+      textarea: document.getElementById('codeTextarea')
+    });
+
+    new Behave({
+      textarea: document.getElementById('styleTextarea')
+    })
   }
 
   updateCode(event){
@@ -54,10 +65,10 @@ export class CodeEditor extends React.Component {
         </div>
 
         <p>HTML/Template Code</p>
-        <textarea onChange={this.updateCode} value={code} />
+        <textarea onChange={this.updateCode} value={code} id='codeTextarea' />
 
         <p>Styling</p>
-        <textarea onChange={this.updateStyle} value={style} />
+        <textarea onChange={this.updateStyle} value={style} id='styleTextarea' />
 
       </div>
     )

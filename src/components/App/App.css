@@ -5,3 +5,18 @@ body {
 .App {
   text-align: center;
 }
+
+.flexbox {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-around;
+  margin-bottom: 25px;
+  align-items: stretch;
+}
+
+.flexbox div {
+  width: 45vw;
+}
+
+.left {
+}

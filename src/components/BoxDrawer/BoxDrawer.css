@@ -1,9 +1,31 @@
 #canvas {
-  float: right;
   /* A4 is 210mm x 297mm. There are 3.779528 px/mm. 210 * 3.779528  */
   width: 793.70088px;
   height: 1122.519816px;
-  background-color: #b0b0b0;
+  background-color: #f1f1f1;
   padding: 10px;
-  position: relative;
+  position: absolute;
+  margin: 0 auto;
+  top: 30px;
+  left: calc(50% - 397px );
+}
+
+#canvas button {
+  position: absolute;
+  top: 0;
+  right: 0;
+}
+
+.hide {
+  display: none;
+}
+
+#modalBackground {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  opacity: 0.8;
 }

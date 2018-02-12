@@ -15,11 +15,8 @@ import juice from 'juice';
 // }
 
 var wkhtmltopdf, mkdirp;
-
-// if( window.electron ){
-  wkhtmltopdf = window.require('wkhtmltopdf');
-  mkdirp = window.require('mkdirp');
-// }
+wkhtmltopdf = window.require('wkhtmltopdf');
+mkdirp = window.require('mkdirp');
 
 class App extends Component {
   constructor(props){
@@ -40,6 +37,7 @@ class App extends Component {
     this.saveState = this.saveState.bind(this);
     this.deleteState = this.deleteState.bind(this);
     this.generatePDF = this.generatePDF.bind(this);
+    this.toggleDrawer = this.toggleDrawer.bind(this);
   }
 
   componentDidMount(){
@@ -52,7 +50,8 @@ class App extends Component {
     return {
       boxes: [],
       boxIndex: 0,
-      selectedCodeBox: 0
+      selectedCodeBox: 0,
+      drawerHidden: true
     }
   }
 
@@ -93,10 +92,10 @@ class App extends Component {
       printablePdf.appendChild(div);
     });
 
-    mkdirp('./public/tmp/');
+    mkdirp('~/reportcards/');
 
     wkhtmltopdf(printablePdf.outerHTML, {
-      output: './public/tmp/wkhtmlpdf.pdf',
+      output: '~/reportcards/wkhtmlpdf.pdf',
       dpi: 300,
       pageSize: 'Letter',
       marginLeft: 0,
@@ -144,6 +143,10 @@ class App extends Component {
   }
 
   deleteState(){
+    this.state.boxes.forEach(box => {
+      this.deleteBox(box);
+    })
+
     localStorage.removeItem('reportcard');
     this.setState( this.initState() );
   }
@@ -170,16 +173,32 @@ class App extends Component {
     this.child.updateSelectedBoxIndex(index);
   }
 
+  toggleDrawer(){
+    this.setState(prevState => ({
+      drawerHidden: !prevState.drawerHidden
+    }));
+  }
+
   render() {
     return (
       <div className="App">
-        <button onClick={this.deleteState}>Delete Template</button>
-        <button onClick={this.saveState}>Save Template</button>
-        <button onClick={this.generatePDF}>Generate PDF</button>
+        <div className='flexbox'>
 
-        <BoxVisualizer boxes={this.state.boxes} deleteBox={this.deleteBox} selectCodeBox={this.selectCodeBox} />
-        <BoxDrawer addBox={this.addBox} boxes={this.state.boxes} ref='drawer' />
-        <CodeEditor boxes={this.state.boxes} updateCode={this.updateCode} updateStyle={this.updateStyle} ref={instance => { this.child = instance; }} />
+          <div className='left'>
+            <button onClick={this.toggleDrawer}>Toggle Drawer</button>
+            <button onClick={this.deleteState}>Delete Template</button>
+            <button onClick={this.saveState}>Save Template</button>
+            <button onClick={this.generatePDF}>Generate PDF</button>
+
+            <BoxVisualizer boxes={this.state.boxes} deleteBox={this.deleteBox} selectCodeBox={this.selectCodeBox} />
+          </div>
+          <div className='right'>
+            <CodeEditor boxes={this.state.boxes} updateCode={this.updateCode} updateStyle={this.updateStyle} ref={instance => { this.child = instance; }} />
+          </div>
+
+        </div>
+
+        <BoxDrawer addBox={this.addBox} boxes={this.state.boxes} drawerHidden={this.state.drawerHidden} toggleDrawer={this.toggleDrawer} ref='drawer' />
       </div>
     );
   }
