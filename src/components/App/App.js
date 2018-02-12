@@ -64,6 +64,7 @@ class App extends Component {
     printablePdf.id = 'printablePdf';
     printablePdf.style.width = '216mm';
     printablePdf.style.height = '279mm';
+    printablePdf.style.fontSize = '3.52778mm';
     printablePdf.style.margin = 0;
     printablePdf.style.position = 'relative';
 
@@ -83,7 +84,7 @@ class App extends Component {
       let html = templateFunction(fixture_data);
 
       // inline all of the CSS styles we have
-      html = juice.inlineContent(html, box.style);
+      html = juice.inlineContent(html, box.style, { inlinePseudoElements: true });
 
       //append that shit to the box
       div.innerHTML = html;
@@ -139,7 +140,7 @@ class App extends Component {
   }
 
   saveState(){
-    localStorage.setItem('reportcard', this.state);
+    localStorage.setItem('reportcard', JSON.stringify(this.state));
   }
 
   deleteState(){
